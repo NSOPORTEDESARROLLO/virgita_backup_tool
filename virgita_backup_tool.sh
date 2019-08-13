@@ -4,7 +4,7 @@
 #Virgita Backup Tool
 
 
-. virgita.conf
+. /home/christopher/Documentos/GitHub/virgita_backup_tool/virgita.conf
 
 
 #System Globals
@@ -14,7 +14,9 @@ DaTe=$(date +%d-%m-%Y)
 FullName="FULL-$HostName-$DaTe"
 DiffName="DIFF-$HostName-$DaTe"
 FullBackupTo="$BackupTo/$HostName"
-
+IncFile="$FullBackupTo/.virgita.snap"
+ToDay=$(date +%A)
+MoDe="$1"
 
 #Create backup Directory if not exists 
 if [ ! -d $FullBackupTo ];then
@@ -28,30 +30,30 @@ SysEx="/proc,/dev,/sys,/tmp"
 Exclude=""
 for i in ${SysEx//,/ };do
 	
-	Exclude=$(printf  "%s "  "$Exclude --exclude=$i/*")
+	Exclude="$Exclude --exclude=$i/*"
 
 done
 
 #User excludes
 for i in ${UserExclude//,/ };do
 	
-	Exclude=$(printf  "%s "  "$Exclude --exclude=$i/*")
+	Exclude="$Exclude --exclude=$i/*"
 
 done
 
 #User exclude extensions
 for i in ${UserExcludeExt//,/ };do
+
+	Exclude="$Exclude --exclude=*.$i"
 	
-	Exclude=$(printf  "%s "  "$Exclude --exclude="\'*.$i\'"")
 
 done
-
 
 
 #Backup Directories
 for i in ${BackupDirs//,/ };do
 	
-	Backup=$(printf  "%s "  "$Backup $i")
+	Backup="$Backup $i"
 
 done
 
@@ -60,8 +62,65 @@ Exclude="$Exclude --exclude=$BackupTo/*"
 
 
 
-echo "$TarPath -czvf $FullBackupTo/$FullName.tgz $Exclude  $Backup"
-$TarPath -czvf $FullBackupTo/$FullName.tgz $Exclude  $Backup
+########### Functions
+function DOFULL () {
+
+	#Do full backup
+
+	rm -f $IncFile
+	if [ "$Compress" = "yes" ];then
+		COMMNAD="$TarPath czvp -g $IncFile -f $FullBackupTo/$FullName.tgz $Exclude $Backup"
+	else 
+		COMMNAD="$TarPath cvp -g $IncFile -f $FullBackupTo/$FullName.tar $Exclude $Backup"
+	fi
+
+	$COMMNAD
+	exit 0
+
+
+}
+
+
+function DODIFF () {
+
+	#Do differential backup
+	if [ "$Compress" = "yes" ];then		
+		COMMNAD="$TarPath czvp -g $IncFile -f $FullBackupTo/$DiffName.tgz $Exclude $Backup"
+	else
+		COMMNAD="$TarPath cvp -g $IncFile -f $FullBackupTo/$DiffName.tar $Exclude $Backup"
+	fi
+
+	$COMMNAD
+	exit 0
+
+}
+
+
+
+###### Run Software
+
+#If DOFULL Forced
+if [ "$MoDe" = "DOFULL" ];then 
+	DOFULL 
+fi
+
+#If Today is FULL
+if [ "$DayOfWeek" = "$ToDay" ];then
+	DOFULL
+fi
+
+
+#If it still does not match then run DODIFF
+DODIFF
+
+
+
+
+
+
+
+
+
 
 
 
