@@ -10,6 +10,7 @@
 #System Globals
 TarPath=$(which tar);if [ "$TarPath" = "" ];then echo "ERROR: I can not find tar command.";exit 1;fi
 HostName=$(hostname)
+FindPath=$(which find)
 DaTe=$(date +%d-%m-%Y)
 FullName="FULL-$HostName-$DaTe"
 DiffName="DIFF-$HostName-$DaTe"
@@ -61,40 +62,8 @@ done
 Exclude="$Exclude --exclude=$BackupTo/*"
 
 
-
-########### Functions
-function DOFULL () {
-
-	#Do full backup
-
-	rm -f $IncFile
-	if [ "$Compress" = "yes" ];then
-		COMMNAD="$TarPath czvp -g $IncFile -f $FullBackupTo/$FullName.tgz $Exclude $Backup"
-	else 
-		COMMNAD="$TarPath cvp -g $IncFile -f $FullBackupTo/$FullName.tar $Exclude $Backup"
-	fi
-
-	$COMMNAD
-	exit 0
-
-
-}
-
-
-function DODIFF () {
-
-	#Do differential backup
-	if [ "$Compress" = "yes" ];then		
-		COMMNAD="$TarPath czvp -g $IncFile -f $FullBackupTo/$DiffName.tgz $Exclude $Backup"
-	else
-		COMMNAD="$TarPath cvp -g $IncFile -f $FullBackupTo/$DiffName.tar $Exclude $Backup"
-	fi
-
-	$COMMNAD
-	exit 0
-
-}
-
+#Load Functions 
+. /home/christopher/Documentos/GitHub/virgita_backup_tool/functions.sh
 
 
 ###### Run Software
