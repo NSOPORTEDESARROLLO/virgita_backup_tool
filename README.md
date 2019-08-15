@@ -1,7 +1,7 @@
 ## virgita Backup Tool for Linux
 
 
-This script are be able to:
+This script is be able to:
 
 - Create full and differential backups.
 - Compresed Backups 
