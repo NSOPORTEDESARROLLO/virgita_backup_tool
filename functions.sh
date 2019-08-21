@@ -5,14 +5,44 @@
 
 
 
+########### Functions
+
 function BackupMysql () {
 
-	DumpPath=$(which mysqldump)
-    if [ "$DumpPath" = "" ];then
+
+	MysqlClient=$(which mysql)
+ 	MysqlDump=$(which mysqldump)
+	
+    if [ "$MysqlDump" = "" ];then
     	echo "ERROR: mysqldump missing install it for Full Mysql Backup"
  		exit 1
  	fi	
 
+  	if [ "$MysqlClient" = "" ];then
+    	echo "ERROR: Mysql Client missing install it for Full Mysql Backup"
+ 		exit 1
+ 	fi	
+
+ 	echo "Mysql Backups enabled"
+
+	if [ -d $MDIR ];then
+		rm -rf $MDIR
+	fi
+
+	mkdir -p $MDIR
+
+	databases=$($MysqlClient -u root -p$MSQLPWD -h $MSQLHOST -e "SHOW DATABASES;" | tr -d "| " | grep -v "+---" |grep -Ev "(Database|information_schema|performance_schema|mysql)" )
+
+
+	for db in $databases;do
+
+		file="$MDIR/$db.sql"
+		#echo $file
+		$MysqlDump -u root -p$MSQLPWD -h $MSQLHOST  "$db" > "$file"
+
+
+
+	done
 
 
 
@@ -20,9 +50,6 @@ function BackupMysql () {
 
 
 
-
-
-########### Functions
 function DELOLD () {
 
 	$FindPath  $FullBackupTo/* -mtime +$DaysToKeep -exec rm {} \;

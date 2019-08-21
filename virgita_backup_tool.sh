@@ -25,7 +25,6 @@ if [ ! -d $FullBackupTo ];then
 fi
 
 
-
 #System excludes
 SysEx="/proc,/dev,/sys,/tmp"
 Exclude=""
@@ -66,7 +65,15 @@ Exclude="$Exclude --exclude=$BackupTo/*"
 . /home/christopher/Documentos/GitHub/virgita_backup_tool/functions.sh
 
 
-###### Run Software
+###### Run Database backups #####
+if [ "$MysqlBackups" = "yes" ];then
+	#Run Mysql Backup
+	BackupMysql
+	Backup="$Backup $MDIR"
+
+fi
+
+
 
 #If DOFULL Forced
 if [ "$MoDe" = "DOFULL" ];then 
