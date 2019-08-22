@@ -1,7 +1,7 @@
 #!/bin/bash
 
 
-. /home/christopher/Documentos/GitHub/virgita_backup_tool/virgita.conf
+. /opt/nsoporte/virgita_backup_tool/config/virgita.conf
 
 
 

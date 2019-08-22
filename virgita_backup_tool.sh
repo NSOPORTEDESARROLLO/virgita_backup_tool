@@ -4,7 +4,7 @@
 #Virgita Backup Tool
 
 
-. /home/christopher/Documentos/GitHub/virgita_backup_tool/virgita.conf
+. /opt/nsoporte/virgita_backup_tool/config/virgita.conf
 
 
 #System Globals
@@ -62,7 +62,7 @@ Exclude="$Exclude --exclude=$BackupTo/*"
 
 
 #Load Functions 
-. /home/christopher/Documentos/GitHub/virgita_backup_tool/functions.sh
+. /opt/nsoporte/virgita_backup_tool/lib/functions.sh
 
 
 ###### Run Database backups #####
