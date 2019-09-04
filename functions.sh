@@ -7,6 +7,43 @@
 
 ########### Functions
 
+function DockerBackup () {
+
+	if [ -d $DockerBackupTo ];then
+		rm -rfv $DockerBackupTo
+	fi
+
+	mkdir -p $DockerBackupTo
+
+	DockerPath=$(which docker)
+
+	if [ ! -f $DockerPath ];then
+		echo "ERROR: I can not find Docker service."
+		exit 1 
+	fi
+
+
+	for i in ${DockerLists//,/ };do
+	
+		$DockerPath save $i -o $		
+
+	done
+
+
+
+
+
+
+}
+
+
+
+
+
+
+
+
+
 function BackupMysql () {
 
 
