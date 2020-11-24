@@ -2,9 +2,19 @@
 
 
 #Virgita Backup Tool
+SCRIPT=`realpath $0`
+SCRIPTPATH=`dirname $SCRIPT`
 
+if [ -f "$SCRIPTPATH/virgita.conf" ];then
 
-. /opt/nsoporte/virgita_backup_tool/config/virgita.conf
+	. $SCRIPTPATH/virgita.conf
+
+else 
+
+	echo "Error: No encuentro el archivo de configuracion virgita.conf"
+	exit 1
+
+fi
 
 
 #System Globals
@@ -18,6 +28,7 @@ FullBackupTo="$BackupTo/$HostName"
 IncFile="$FullBackupTo/.virgita.snap"
 ToDay=$(date +%A)
 MoDe="$1"
+
 
 #Create backup Directory if not exists 
 if [ ! -d $FullBackupTo ];then
@@ -62,7 +73,16 @@ Exclude="$Exclude --exclude=$BackupTo/*"
 
 
 #Load Functions 
-. /opt/nsoporte/virgita_backup_tool/lib/functions.sh
+if [ -f "$SCRIPTPATH/functions.sh" ];then
+
+	. $SCRIPTPATH/functions.sh
+
+else
+
+	echo "Error: No encuentro el archivo de funciones"
+	exit 1
+
+fi
 
 
 ###### Run Database backups #####
@@ -74,20 +94,41 @@ if [ "$MysqlBackups" = "yes" ];then
 fi
 
 
-
-#If DOFULL Forced
-if [ "$MoDe" = "DOFULL" ];then 
-	DOFULL 
+######Backup Boot System
+if [ "$MBRDUMP" != "" ];then
+	DumpMbr
 fi
+
+
+#Check for first time backup
+if [ ! -f "$IncFile" ];then
+	echo "No existe un backup FULL aun, creando el primer FULL"
+	DOFULL
+	CleanFiles
+	exit 0
+fi
+
 
 #If Today is FULL
 if [ "$DayOfWeek" = "$ToDay" ];then
 	DOFULL
+	CleanFiles
+	exit 0
+fi
+
+
+#If DOFULL Forced
+if [ "$MoDe" = "DOFULL" ];then 
+	DOFULL
+	CleanFiles
+	exit 0
 fi
 
 
 #If it still does not match then run DODIFF
 DODIFF
+CleanFiles
+exit 0
 
 
 

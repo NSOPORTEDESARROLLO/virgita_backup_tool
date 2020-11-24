@@ -7,8 +7,7 @@ This script is be able to:
 - Compresed Backups 
 - Backup Whole Linux S.O or simple folder
 - Backup all Mysql DataBases 
-- All config in one file
-- Automatic Docker images backups 
+- All config in one file 
 
 
 ## How install ? 

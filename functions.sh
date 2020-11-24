@@ -1,44 +1,34 @@
 #!/bin/bash
 
 
-. /opt/nsoporte/virgita_backup_tool/config/virgita.conf
+SCRIPT=`realpath $0`
+SCRIPTPATH=`dirname $SCRIPT`
 
+if [ -f "$SCRIPTPATH/virgita.conf" ];then
+
+	. $SCRIPTPATH/virgita.conf
+
+else 
+
+	echo "Error: No encuentro el archivo de configuracion virgita.conf"
+	exit 1
+
+fi
 
 
 ########### Functions
+function DumpMbr () {
 
-function DockerBackup () {
-
-	if [ -d $DockerBackupTo ];then
-		rm -rfv $DockerBackupTo
+	if [ ! -d "/var/spool/virgita/boot" ];then
+		mkdir -p /var/spool/virgita/boot
 	fi
 
-	mkdir -p $DockerBackupTo
-
-	DockerPath=$(which docker)
-
-	if [ ! -f $DockerPath ];then
-		echo "ERROR: I can not find Docker service."
-		exit 1 
-	fi
-
-
-	for i in ${DockerLists//,/ };do
-	
-		$DockerPath save $i -o $		
-
-	done
-
-
+	dd if=$MBRDUMP of=/var/spool/virgita/boot/mbr.mbr bs=466 count=1
 
 
 
 
 }
-
-
-
-
 
 
 
@@ -87,10 +77,10 @@ function BackupMysql () {
 
 
 
-function DELOLD () {
+function CleanFiles () {
 
 	$FindPath  $FullBackupTo/* -mtime +$DaysToKeep -exec rm {} \;
-
+	rm -rf /var/spool/virgita
 
 
 }
@@ -104,11 +94,10 @@ function DOFULL () {
 	if [ "$Compress" = "yes" ];then
 		COMMNAD="$TarPath czvp -g $IncFile -f $FullBackupTo/$FullName.tgz $Exclude $Backup"
 	else 
-		COMMNAD="$TarPath cvp -g $IncFile -f $FullBackupTo/$FullName.tar $Exclude $Backup"
+		COMMNAD="$TarPath cvp -g $IncFile -f $FullBackupTo/$FullName.tar $Exclude $Backup" 
 	fi
 
-	$COMMNAD
-	$DELOLD
+	$COMMNAD > /dev/null
 	exit 0
 
 
@@ -124,8 +113,7 @@ function DODIFF () {
 		COMMNAD="$TarPath cvp -g $IncFile -f $FullBackupTo/$DiffName.tar $Exclude $Backup"
 	fi
 
-	$COMMNAD
-	$DELOLD
+	$COMMNAD > /dev/null
 	exit 0
 
 }
