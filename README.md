@@ -12,4 +12,9 @@ This script is be able to:
 
 ## How install ? 
 
+- Clone repo from github: git clone https://github.com/NSOPORTEDESARROLLO/virgita_backup_tool /usr/src/virgita
+- Move to folder to execute: cp -rfp /usr/src/virgita /opt/
+- Edit virgita.conf
+- Run "virgita_backup_tool.sh DOFULL" for initial Backup
+
 
